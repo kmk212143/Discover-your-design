@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { quizData } from '../data/quizData';
 import { useStore } from '../store/useStore';
 import { ArrowLeft } from 'lucide-react';
+import { t } from '../data/translations';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -20,10 +21,11 @@ export default function QuizPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState([]);
   const saveQuizResult = useStore(state => state.saveQuizResult);
+  const lang = useStore(state => state.lang);
   const navigate = useNavigate();
 
   const q = quizData[currentStep];
-  const progress = ((currentStep) / quizData.length) * 100;
+  const progress = (currentStep / quizData.length) * 100;
 
   const handleOptionClick = (styles) => {
     const newAnswers = [...answers];
@@ -58,7 +60,7 @@ export default function QuizPage() {
     }
     
     saveQuizResult(dominantStyle);
-    navigate('/dashboard');
+    navigate('/result');
   };
 
   return (
@@ -74,7 +76,9 @@ export default function QuizPage() {
           >
             <div style={{ textAlign: 'center', marginBottom: 'var(--space-xl)' }}>
               <div style={{ color: 'var(--color-text-tertiary)', fontWeight: 500, marginBottom: 'var(--space-sm)' }}>
-                Question {currentStep + 1} of {quizData.length}
+                {t('quiz.questionOf', lang)
+                  .replace('{current}', currentStep + 1)
+                  .replace('{total}', quizData.length)}
               </div>
               <div style={{ width: '100%', height: '6px', background: 'var(--color-border)', borderRadius: 'var(--radius-full)', overflow: 'hidden', marginBottom: 'var(--space-2xl)' }}>
                 <motion.div 
@@ -84,7 +88,9 @@ export default function QuizPage() {
                   style={{ height: '100%', background: 'var(--color-primary)' }}
                 />
               </div>
-              <h2 style={{ fontSize: '2rem' }}>{q.title}</h2>
+              <h2 style={{ fontSize: '2rem' }}>
+                {lang === 'ar' && q.title_ar ? q.title_ar : q.title}
+              </h2>
             </div>
 
             <div className={q.type === 'image' || q.type === 'color' ? 'grid-2' : ''} style={{ display: q.type === 'text' ? 'flex' : 'grid', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -108,7 +114,7 @@ export default function QuizPage() {
                     <img src={opt.image} alt={opt.label} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
                   )}
                   <div style={{ padding: q.type === 'text' ? 0 : 'var(--space-md)', fontWeight: 500, fontSize: q.type === 'text' ? '1.125rem' : '1rem' }}>
-                    {opt.label}
+                    {lang === 'ar' && opt.label_ar ? opt.label_ar : opt.label}
                   </div>
                 </motion.div>
               ))}
@@ -116,8 +122,8 @@ export default function QuizPage() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--space-2xl)' }}>
               {currentStep > 0 ? (
-                <button onClick={() => setCurrentStep(s => s - 1)} className="btn btn-secondary">
-                  <ArrowLeft size={18} /> Previous
+                <button onClick={() => setCurrentStep(s => s - 1)} className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ArrowLeft size={18} style={{ transform: lang === 'ar' ? 'rotate(180deg)' : 'none' }} /> {t('quiz.previous', lang)}
                 </button>
               ) : <div />}
             </div>

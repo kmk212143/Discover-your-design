@@ -9,6 +9,9 @@ import AuthPages from './pages/AuthPages';
 import DashboardPage from './pages/DashboardPage';
 import QuizPage from './pages/QuizPage';
 import ProfilePage from './pages/ProfilePage';
+import DesignStylesPage from './pages/DesignStylesPage';
+import DesignStyleDetailsPage from './pages/DesignStyleDetailsPage';
+import QuizResultPage from './pages/QuizResultPage';
 
 function App() {
   const location = useLocation();
@@ -32,6 +35,9 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/styles" element={<DesignStylesPage />} />
+            <Route path="/styles/:styleSlug" element={<DesignStyleDetailsPage />} />
+            <Route path="/result" element={<QuizResultPage />} />
           </Routes>
         </AnimatePresence>
       </main>

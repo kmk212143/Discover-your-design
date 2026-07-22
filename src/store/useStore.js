@@ -41,12 +41,29 @@ export const useStore = create((set, get) => ({
 
   login: (email, password) => {
     const { users_db } = get();
-    const user = users_db.find(u => u.email === email && u.password === password);
-    if (!user) throw new Error("Invalid email or password.");
+    const userIndex = users_db.findIndex(u => u.email === email && u.password === password);
+    if (userIndex === -1) throw new Error("Invalid email or password.");
     
-    const { password: _, ...sessionUser } = user;
+    const user = users_db[userIndex];
+    const pendingQuizResult = localStorage.getItem('quizResult');
+    
+    let updatedHistory = [...(user.quizHistory || [])];
+    if (pendingQuizResult) {
+      // Check if it's already there to avoid duplicates if they refreshed, or just add it
+      const alreadyHas = updatedHistory.some(h => h.style === pendingQuizResult);
+      if (!alreadyHas) {
+        updatedHistory.push({ style: pendingQuizResult, date: new Date().toISOString() });
+      }
+      localStorage.removeItem('quizResult');
+    }
+    
+    const newDb = [...users_db];
+    newDb[userIndex] = { ...user, quizHistory: updatedHistory };
+    localStorage.setItem('users_db', JSON.stringify(newDb));
+    
+    const { password: _, ...sessionUser } = newDb[userIndex];
     localStorage.setItem('user', JSON.stringify(sessionUser));
-    set({ user: sessionUser });
+    set({ users_db: newDb, user: sessionUser });
     return sessionUser;
   },
 

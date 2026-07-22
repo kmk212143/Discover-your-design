@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { UserCircle, Eye, EyeOff } from 'lucide-react';
+import { t } from '../data/translations';
 
 const pageVariants = {
   initial: { opacity: 0, scale: 0.98 },
@@ -13,7 +14,7 @@ const pageVariants = {
 export default function AuthPages({ type = 'login' }) {
   const isLogin = type === 'login';
   const navigate = useNavigate();
-  const { login, signUp } = useStore();
+  const { login, signUp, lang } = useStore();
   
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function AuthPages({ type = 'login' }) {
     setError('');
     
     if (!isLogin && password !== confirm) {
-      return setError('Passwords do not match.');
+      return setError(t('auth.passwordsMismatch', lang));
     }
     
     setLoading(true);
@@ -62,8 +63,10 @@ export default function AuthPages({ type = 'login' }) {
       <div className="card" style={{ width: '100%', maxWidth: '480px', padding: 'var(--space-3xl)' }}>
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-2xl)' }}>
           <UserCircle size={48} color="var(--color-primary)" style={{ marginBottom: 'var(--space-sm)' }} />
-          <h2>{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
-          <p style={{ color: 'var(--color-text-secondary)' }}>{isLogin ? 'Enter your details to access your dashboard.' : 'Sign up to save your styles and results.'}</p>
+          <h2>{isLogin ? t('auth.welcomeBack', lang) : t('auth.createAccount', lang)}</h2>
+          <p style={{ color: 'var(--color-text-secondary)' }}>
+            {isLogin ? t('auth.loginDesc', lang) : t('auth.signupDesc', lang)}
+          </p>
         </div>
         
         {error && (
@@ -75,21 +78,21 @@ export default function AuthPages({ type = 'login' }) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
           {!isLogin && (
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Full Name</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('auth.fullName', lang)}</label>
               <input type="text" className="form-control" required value={name} onChange={e => setName(e.target.value)} />
             </div>
           )}
           
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Email Address</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('auth.email', lang)}</label>
             <input type="email" className="form-control" required value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Password</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('auth.password', lang)}</label>
             <div style={{ position: 'relative' }}>
               <input type={showPwd ? 'text' : 'password'} className="form-control" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} />
-              <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)' }}>
+              <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', [lang === 'ar' ? 'left' : 'right']: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)' }}>
                 {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
@@ -97,21 +100,21 @@ export default function AuthPages({ type = 'login' }) {
           
           {!isLogin && (
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Confirm Password</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>{t('auth.confirmPassword', lang)}</label>
               <input type="password" className="form-control" required minLength={6} value={confirm} onChange={e => setConfirm(e.target.value)} />
             </div>
           )}
           
           <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', padding: '1rem', marginTop: 'var(--space-sm)' }}>
-            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+            {loading ? t('auth.processing', lang) : (isLogin ? t('auth.signIn', lang) : t('auth.createBtn', lang))}
           </button>
         </form>
         
         <div style={{ textAlign: 'center', marginTop: 'var(--space-2xl)', fontSize: '0.9rem' }}>
           {isLogin ? (
-            <>Don't have an account? <Link to="/signup" style={{ fontWeight: 600 }}>Sign up</Link></>
+            <>{t('auth.noAccount', lang)} <Link to="/signup" style={{ fontWeight: 600 }}>{t('nav.signup', lang)}</Link></>
           ) : (
-            <>Already have an account? <Link to="/login" style={{ fontWeight: 600 }}>Log in</Link></>
+            <>{t('auth.hasAccount', lang)} <Link to="/login" style={{ fontWeight: 600 }}>{t('nav.login', lang)}</Link></>
           )}
         </div>
       </div>

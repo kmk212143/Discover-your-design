@@ -13,7 +13,12 @@ const itemVariants = {
   animate: { opacity: 1, y: 0 }
 };
 
+import { useStore } from '../store/useStore';
+import { t } from '../data/translations';
+
 export default function LandingPage() {
+  const lang = useStore(state => state.lang);
+
   return (
     <motion.div 
       className="container" 
@@ -25,16 +30,16 @@ export default function LandingPage() {
     >
       <motion.div variants={itemVariants} style={{ marginBottom: 'var(--space-2xl)' }}>
         <h1 style={{ fontSize: '4rem', color: 'var(--color-primary)', marginBottom: 'var(--space-md)' }}>
-          Discover Your Perfect Design
+          {t('landing.title', lang)}
         </h1>
         <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
-          Take our intelligent quiz to uncover your unique interior design style, tailored perfectly to your lifestyle and taste.
+          {t('landing.subtitle', lang)}
         </p>
       </motion.div>
       
       <motion.div variants={itemVariants}>
         <Link to="/quiz" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.125rem' }}>
-          <Sparkles size={20} /> Start the Quiz <ArrowRight size={20} />
+          <Sparkles size={20} /> {t('landing.startQuiz', lang)} <ArrowRight size={20} style={{ transform: lang === 'ar' ? 'rotate(180deg)' : 'none' }} />
         </Link>
       </motion.div>
       

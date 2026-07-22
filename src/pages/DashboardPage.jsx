@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { Link, Navigate } from 'react-router-dom';
-import { Sparkles, History } from 'lucide-react';
+import { Sparkles, ArrowRight, Compass } from 'lucide-react';
+import { t } from '../data/translations';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -15,7 +16,7 @@ const itemVariants = {
 };
 
 export default function DashboardPage() {
-  const user = useStore(state => state.user);
+  const { user, lang } = useStore();
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -23,7 +24,9 @@ export default function DashboardPage() {
 
   const history = user.quizHistory || [];
   const attempts = history.length;
-  const lastResult = attempts > 0 ? history[history.length - 1].style : 'None yet';
+  const lastResult = attempts > 0 ? history[history.length - 1].style : null;
+  
+  const styleSlug = lastResult ? lastResult.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '') : '';
 
   return (
     <motion.div 
@@ -35,14 +38,18 @@ export default function DashboardPage() {
       exit="exit"
     >
       <motion.div variants={itemVariants} style={{ marginBottom: 'var(--space-3xl)' }}>
-        <h1>Welcome back, {user.name.split(' ')[0]}!</h1>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem' }}>Here is your design journey.</p>
+        <h1>
+          {t('dashboard.welcome', lang).replace('{name}', user.name.split(' ')[0])}
+        </h1>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem' }}>
+          {t('dashboard.subtitle', lang)}
+        </p>
       </motion.div>
 
       <div className="grid-2" style={{ marginBottom: 'var(--space-3xl)' }}>
         <motion.div className="card" variants={itemVariants}>
           <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-sm)' }}>
-            Quiz Attempts
+            {t('dashboard.attempts', lang)}
           </div>
           <div style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', fontWeight: 700, color: 'var(--color-primary)' }}>
             {attempts}
@@ -51,17 +58,36 @@ export default function DashboardPage() {
         
         <motion.div className="card" variants={itemVariants}>
           <div style={{ color: 'var(--color-text-tertiary)', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-sm)' }}>
-            Current Dominant Style
+            {t('dashboard.dominantStyle', lang)}
           </div>
           <div style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)', fontWeight: 600, color: 'var(--color-primary)', marginTop: '0.5rem' }}>
-            {lastResult}
+            {lastResult ? (
+              <Link 
+                to={`/styles/${styleSlug}`} 
+                style={{ 
+                  textDecoration: 'underline', 
+                  color: 'var(--color-accent)', 
+                  fontWeight: 700, 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '0.5rem' 
+                }}
+              >
+                {lastResult} <ArrowRight size={18} style={{ transform: lang === 'ar' ? 'rotate(180deg)' : 'none' }} />
+              </Link>
+            ) : (
+              t('dashboard.noneYet', lang)
+            )}
           </div>
         </motion.div>
       </div>
 
-      <motion.div variants={itemVariants} style={{ display: 'flex', gap: 'var(--space-md)' }}>
+      <motion.div variants={itemVariants} style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
         <Link to="/quiz" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
-          <Sparkles size={18} /> Retake Quiz
+          <Sparkles size={18} /> {t('dashboard.retake', lang)}
+        </Link>
+        <Link to="/styles" className="btn btn-secondary" style={{ padding: '1rem 2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Compass size={18} /> {t('dashboard.exploreStyles', lang)}
         </Link>
       </motion.div>
     </motion.div>
